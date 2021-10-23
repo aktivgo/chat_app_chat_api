@@ -2,6 +2,8 @@ import ws from 'ws';
 
 const server = new ws.Server({port: 8000});
 
+console.log("Server started")
+
 let onlineUsersList = [];
 
 server.on('connection', ws => {
@@ -19,9 +21,6 @@ server.on('connection', ws => {
         });
     });
 });
-
-server.listen(8000, () => console.log("Server started"));
-
 
 /*
 import ws from "ws";
