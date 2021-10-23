@@ -1,4 +1,34 @@
 import ws from "ws";
+
+const server = new ws.Server({port: 8000});
+
+let onlineUsersList = [];
+
+let nameG;
+
+server.on('connection', ws => {
+    ws.on('message', message => {
+        let messages = JSON.parse(message);
+        if (onlineUsersList.indexOf(messages.name) === -1) {
+            onlineUsersList.push(messages.name);
+        }
+        nameG = messages.name;
+        const name = messages.name;
+        const mes = messages.message;
+        server.clients.forEach(client => {
+            if (client.readyState === ws.OPEN) {
+                client.send(JSON.stringify({name, mes, onlineUsersList}));
+            }
+        });
+    });
+    ws.on('close', function () {
+        onlineUsersList.slice(onlineUsersList.indexOf(nameG), 1);
+    });
+});
+
+
+/*
+import ws from "ws";
 const {Server} = ws;
 import {v4 as uuid} from "uuid";
 import {writeFile, readFileSync, existsSync} from "fs";
@@ -36,4 +66,4 @@ process.on('SIGINT', () => {
         }
         process.exit();
     })
-})
+})*/
