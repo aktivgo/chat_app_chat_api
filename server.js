@@ -4,7 +4,11 @@ const server = new ws.Server({port: 8000});
 
 console.log("Server started")
 
-let onlineUsersList = new Map();
+//let onlineUsersList = new Map();
+
+let onlineNames = [];
+let onlineId = [];
+let forbiddenWords = ['блять', 'сука', 'ебать', 'ебля', 'ебаный', 'ёбаный', 'пизда', 'долбоёб', 'хуй','хуёвый', 'хуевый'];
 
 /*server.on('connection', ws => {
     ws.on('message', messageClient => {
@@ -23,11 +27,21 @@ let onlineUsersList = new Map();
 });*/
 
 const sendOnlineUsersList = (infoMessage) => {
-    console.log(onlineUsersList);
     server.clients.forEach(client => client.send(JSON.stringify({
         event: 'eventUser',
-        payload: {onlineUsersList, infoMessage}
-    })))
+        payload: {onlineNames, infoMessage}
+    })));
+}
+
+function censorship(userMessage) {
+    const words = userMessage.split();
+    for (let i in words) {
+        let word = words[i].toLowerCase();
+        if(forbiddenWords.indexOf(word) !== -1) {
+            userMessage = userMessage.replace(words[i], '*'.repeat(word.length))
+        }
+    }
+    return userMessage;
 }
 
 const dispatchEvent = (message) => {
@@ -38,7 +52,8 @@ const dispatchEvent = (message) => {
     switch (json.event) {
 
         case "sendMessage": {
-            const userMessage = json.payload.message;
+            let userMessage = json.payload.message;
+            userMessage = censorship(userMessage);
             server.clients.forEach(client => client.send(JSON.stringify({
                 event: 'sendMessage',
                 payload: {userName, userMessage}
@@ -48,14 +63,18 @@ const dispatchEvent = (message) => {
 
         case "addUser": {
             const userId = json.payload.userId;
-            onlineUsersList.set(userId, userName);
+            if (onlineId.indexOf(userId) !== -1) return;
+            onlineNames.push(userName);
+            onlineId.push(userId);
             sendOnlineUsersList(userName + ' подключился к чату');
         }
             break;
 
         case "deleteUser": {
             const userId = json.payload.userId;
-            onlineUsersList.delete(userId);
+            const index = onlineId.indexOf(userId);
+            onlineNames.splice(index, 1);
+            onlineId.splice(index, 1);
             sendOnlineUsersList(userName + ' отключился от чата');
         }
             break;
