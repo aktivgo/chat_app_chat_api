@@ -47,7 +47,7 @@ function censorship(userMessage) {
 const dispatchEvent = (message) => {
 
     const json = JSON.parse(message);
-    const userName = json.payload.userName;
+    const userName = json.payload.curUserName;
 
     switch (json.event) {
 
@@ -62,7 +62,7 @@ const dispatchEvent = (message) => {
             break;
 
         case "addUser": {
-            const userId = json.payload.userId;
+            const userId = json.payload.curUserId;
             if (onlineId.indexOf(userId) !== -1) return;
             onlineNames.push(userName);
             onlineId.push(userId);
@@ -71,7 +71,7 @@ const dispatchEvent = (message) => {
             break;
 
         case "deleteUser": {
-            const userId = json.payload.userId;
+            const userId = json.payload.curUserId;
             const index = onlineId.indexOf(userId);
             onlineNames.splice(index, 1);
             onlineId.splice(index, 1);
