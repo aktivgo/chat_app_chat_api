@@ -10,7 +10,7 @@ connectToDb();
 
 let onlineNames = [];
 let onlineId = [];
-let forbiddenWords = ['блять', 'сука', 'ебать', 'ебля', 'ебаный', 'ёбаный', 'пизда', 'долбоёб', 'хуй', 'хуёвый', 'хуевый'];
+let forbiddenWords = ['блять', 'сука', 'ебать', 'ебля', 'ебаный', 'ёбаный', 'пизда', 'долбоёб', 'хуй', 'хуёвый', 'хуевый', 'ахуеть', 'пиздец'];
 
 const sendOnlineUsersList = (infoMessage) => {
     server.clients.forEach(client => client.send(JSON.stringify({
@@ -20,7 +20,7 @@ const sendOnlineUsersList = (infoMessage) => {
 }
 
 function censorship(userMessage) {
-    const words = userMessage.split();
+    const words = userMessage.split(' ');
     for (let i in words) {
         let word = words[i].toLowerCase();
         if (forbiddenWords.indexOf(word) !== -1) {
@@ -53,7 +53,6 @@ function sendAllMessages(ws) {
 }
 
 function saveMessage(data) {
-    console.log(data);
     db.query("insert into messages  (id, userName, message) values (null, ?, ?)", data, function (err, results) {
     });
 }
@@ -82,7 +81,7 @@ const dispatchEvent = (message, ws) => {
             onlineNames.push(userName);
             onlineId.push(userId);
             sendAllMessages(ws);
-            sendOnlineUsersList(userName + ' подключился к чату');
+            setTimeout(() => {sendOnlineUsersList(userName + ' подключился к чату');}, 50);
         }
             break;
 
