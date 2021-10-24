@@ -4,9 +4,9 @@ const server = new ws.Server({port: 8000});
 
 console.log("Server started")
 
-let onlineUsersList = [];
+let onlineUsersList = new Map();
 
-server.on('connection', ws => {
+/*server.on('connection', ws => {
     ws.on('message', messageClient => {
         const messageArr = JSON.parse(messageClient);
         const name = messageArr.name;
@@ -20,7 +20,57 @@ server.on('connection', ws => {
             }
         });
     });
+});*/
+
+const sendOnlineUsersList = (infoMessage) => {
+    console.log(onlineUsersList);
+    server.clients.forEach(client => client.send(JSON.stringify({
+        event: 'eventUser',
+        payload: {onlineUsersList, infoMessage}
+    })))
+}
+
+const dispatchEvent = (message) => {
+
+    const json = JSON.parse(message);
+    const userName = json.payload.userName;
+
+    switch (json.event) {
+
+        case "sendMessage": {
+            const userMessage = json.payload.message;
+            server.clients.forEach(client => client.send(JSON.stringify({
+                event: 'sendMessage',
+                payload: {userName, userMessage}
+            })));
+        }
+            break;
+
+        case "addUser": {
+            const userId = json.payload.userId;
+            onlineUsersList.set(userId, userName);
+            sendOnlineUsersList(userName + ' подключился к чату');
+        }
+            break;
+
+        case "deleteUser": {
+            const userId = json.payload.userId;
+            onlineUsersList.delete(userId);
+            sendOnlineUsersList(userName + ' отключился от чата');
+        }
+            break;
+    }
+}
+
+
+server.on('connection', ws => {
+    ws.on('message', m => dispatchEvent(m, ws));
+    ws.on("error", e => ws.send(JSON.stringify({event: 'error', payload: e})));
 });
+
+/*ws.on('message', m => {
+    server.clients.forEach(client => client.send(m));
+});*/
 
 /*
 import ws from "ws";
