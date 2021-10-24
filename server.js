@@ -10,7 +10,7 @@ connectToDb();
 
 let onlineNames = [];
 let onlineId = [];
-let forbiddenWords = ['блять', 'сука', 'ебать', 'ебля', 'ебаный', 'ёбаный', 'пизда', 'долбоёб', 'хуй', 'хуёвый', 'хуевый', 'ахуеть', 'пиздец'];
+let forbiddenWords = ['блять', 'сука', 'ебать', 'ебля', 'ебаный', 'ёбаный', 'пизда', 'долбоёб', 'хуй', 'хуёвый', 'хуевый'];
 
 const sendOnlineUsersList = (infoMessage) => {
     server.clients.forEach(client => client.send(JSON.stringify({
@@ -53,6 +53,7 @@ function sendAllMessages(ws) {
 }
 
 function saveMessage(data) {
+    console.log(data);
     db.query("insert into messages  (id, userName, message) values (null, ?, ?)", data, function (err, results) {
     });
 }
@@ -81,7 +82,7 @@ const dispatchEvent = (message, ws) => {
             onlineNames.push(userName);
             onlineId.push(userId);
             sendAllMessages(ws);
-            setTimeout(() => {sendOnlineUsersList(userName + ' подключился к чату');}, 50);
+            sendOnlineUsersList(userName + ' подключился к чату');
         }
             break;
 
