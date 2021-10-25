@@ -53,7 +53,6 @@ function sendAllMessages(ws) {
 }
 
 function saveMessage(data) {
-    console.log(data);
     db.query("insert into messages  (id, userName, message) values (null, ?, ?)", data, function (err, results) {
     });
 }
@@ -82,7 +81,7 @@ const dispatchEvent = (message, ws) => {
             onlineNames.push(userName);
             onlineId.push(userId);
             sendAllMessages(ws);
-            sendOnlineUsersList(userName + ' подключился к чату');
+            setTimeout(() => sendOnlineUsersList(userName + ' подключился к чату'), 50);
         }
             break;
 
