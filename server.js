@@ -46,9 +46,12 @@ function connectToDb() {
     });
 }
 
-function sendAllMessages(ws) {
-    db.query("select * from messages", function (err, results) {
-        ws.send(JSON.stringify({event: 'getMessagesFromDb', payload: {results}}))
+async function sendAllMessages(ws) {
+    return new Promise(resolve => {
+        db.query("select * from messages", function (err, results) {
+            ws.send(JSON.stringify({event: 'getMessagesFromDb', payload: {results}}));
+            resolve();
+        });
     });
 }
 
@@ -80,8 +83,10 @@ const dispatchEvent = (message, ws) => {
             if (onlineId.indexOf(userId) !== -1) return;
             onlineNames.push(userName);
             onlineId.push(userId);
-            sendAllMessages(ws);
-            setTimeout(() => sendOnlineUsersList(userName + ' подключился к чату'), 50);
+            (async () => {
+                await sendAllMessages(ws);
+                sendOnlineUsersList(userName + ' подключился к чату')
+            })()
         }
             break;
 
