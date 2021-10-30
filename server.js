@@ -116,9 +116,7 @@ const dispatchEvent = (message, ws) => {
             if (!userId || !userName) return;
 
             server.clients.forEach(client => {
-                if (onlineId.indexOf(client.userId) !== -1) {
-                    client.send(JSON.stringify({event: 'exit', payload: {userName}}))
-                }
+                client.send(JSON.stringify({event: 'checkToken', payload: {userName}}))
             });
 
             deleteUserFromOnline(userId, userName);
