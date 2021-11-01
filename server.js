@@ -2,7 +2,7 @@ import ws from 'ws';
 import mysql from 'mysql2';
 import jwt from 'jsonwebtoken';
 
-const server = new ws.Server({port: 8000});
+const server = new ws.Server({port: process.env.WEBSOCKET_PORT});
 
 console.log('Server started')
 
