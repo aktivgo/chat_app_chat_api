@@ -154,7 +154,6 @@ function censor(message) {
     return message;
 }
 
-
 /*
  Событие получения страницы сообщений из БД
  */
@@ -175,7 +174,6 @@ function sendMessagesFromDb(page, ws) {
         ws.send(JSON.stringify({event: event, payload: {results}}));
     });
 }
-
 
 /*
  Событие отключения
@@ -204,7 +202,6 @@ function disconnectionEvent(userId, userName, ws) {
 function isSingleActiveSession(userId) {
     return activeSessions.get(userId) === 1;
 }
-
 
 /*
  Событие выхода
@@ -237,7 +234,7 @@ function deleteUserFromOnline(userId, userName) {
 
 function sendOnlineList() {
     server.clients.forEach(client => client.send(JSON.stringify({
-        event: 'sendOnlineList',
+        event: 'updateOnlineList',
         payload: {onlineNames}
     })));
 }
